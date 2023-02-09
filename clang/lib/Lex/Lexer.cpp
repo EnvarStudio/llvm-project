@@ -295,7 +295,9 @@ static size_t getSpellingSlow(const Token &Tok, const char *BufPtr,
     // splicing do not occur within their d-char-sequence nor within their
     // r-char-sequence.
     if (Length >= 2 &&
-        Spelling[Length - 2] == 'R' && Spelling[Length - 1] == '"') {
+        (Spelling[Length - 2] == 'R' ||
+         Spelling[Length - 2] == 'f' ||
+         Spelling[Length - 2] == 'n') && Spelling[Length - 1] == '"') {
       // Search backwards from the end of the token to find the matching closing
       // quote.
       const char *RawEnd = BufEnd;
@@ -3748,7 +3750,7 @@ LexStart:
                                tok::utf16_char_constant);
 
       // UTF-16 raw string literal
-      if (Char == 'R' && LangOpts.CPlusPlus11 &&
+      if ((Char == 'R' || Char == 'f' || Char == 'n') && LangOpts.CPlusPlus11 &&
           getCharAndSize(CurPtr + SizeTmp, SizeTmp2) == '"')
         return LexRawStringLiteral(Result,
                                ConsumeChar(ConsumeChar(CurPtr, SizeTmp, Result),
@@ -3770,7 +3772,7 @@ LexStart:
                                   SizeTmp2, Result),
               tok::utf8_char_constant);
 
-        if (Char2 == 'R' && LangOpts.CPlusPlus11) {
+        if ((Char == 'R' || Char == 'f' || Char == 'n') && LangOpts.CPlusPlus11) {
           unsigned SizeTmp3;
           char Char3 = getCharAndSize(CurPtr + SizeTmp + SizeTmp2, SizeTmp3);
           // UTF-8 raw string literal
@@ -3806,7 +3808,7 @@ LexStart:
                                tok::utf32_char_constant);
 
       // UTF-32 raw string literal
-      if (Char == 'R' && LangOpts.CPlusPlus11 &&
+      if ((Char == 'R' || Char == 'f' || Char == 'n') && LangOpts.CPlusPlus11 &&
           getCharAndSize(CurPtr + SizeTmp, SizeTmp2) == '"')
         return LexRawStringLiteral(Result,
                                ConsumeChar(ConsumeChar(CurPtr, SizeTmp, Result),
@@ -3818,6 +3820,8 @@ LexStart:
     return LexIdentifierContinue(Result, CurPtr);
 
   case 'R': // Identifier or C++0x raw string literal
+  case 'f': // Identifier or AngelScript format string literal
+  case 'n': // Identifier or AngelScript FName string literal
     // Notify MIOpt that we read a non-whitespace/non-comment token.
     MIOpt.ReadToken();
 
@@ -3844,7 +3848,7 @@ LexStart:
                               tok::wide_string_literal);
 
     // Wide raw string literal.
-    if (LangOpts.CPlusPlus11 && Char == 'R' &&
+    if (LangOpts.CPlusPlus11 && (Char == 'R' || Char == 'f' || Char == 'n') &&
         getCharAndSize(CurPtr + SizeTmp, SizeTmp2) == '"')
       return LexRawStringLiteral(Result,
                                ConsumeChar(ConsumeChar(CurPtr, SizeTmp, Result),
@@ -3863,11 +3867,10 @@ LexStart:
   case 'H': case 'I': case 'J': case 'K':    /*'L'*/case 'M': case 'N':
   case 'O': case 'P': case 'Q':    /*'R'*/case 'S': case 'T':    /*'U'*/
   case 'V': case 'W': case 'X': case 'Y': case 'Z':
-  case 'a': case 'b': case 'c': case 'd': case 'e': case 'f': case 'g':
-  case 'h': case 'i': case 'j': case 'k': case 'l': case 'm': case 'n':
-  case 'o': case 'p': case 'q': case 'r': case 's': case 't':    /*'u'*/
-  case 'v': case 'w': case 'x': case 'y': case 'z':
-  case '_':
+  case 'a': case 'b': case 'c': case 'd': case 'e': case 'g': case 'h':
+  case 'i': case 'j': case 'k': case 'l': case 'm': case 'o': case 'p':
+  case 'q': case 'r': case 's': case 't':   /*'u'*/ case 'v': case 'w':
+  case 'x': case 'y': case 'z': case '_':
     // Notify MIOpt that we read a non-whitespace/non-comment token.
     MIOpt.ReadToken();
     return LexIdentifierContinue(Result, CurPtr);

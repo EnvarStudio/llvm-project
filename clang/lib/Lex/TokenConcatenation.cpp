@@ -22,7 +22,7 @@ using namespace clang;
 static bool IsStringPrefix(StringRef Str, bool CPlusPlus11) {
 
   if (Str[0] == 'L' ||
-      (CPlusPlus11 && (Str[0] == 'u' || Str[0] == 'U' || Str[0] == 'R'))) {
+      (CPlusPlus11 && (Str[0] == 'u' || Str[0] == 'U' || Str[0] == 'R' || Str[0] == 'f' || Str[0] == 'n'))) {
 
     if (Str.size() == 1)
       return true; // "L", "u", "U", and "R"

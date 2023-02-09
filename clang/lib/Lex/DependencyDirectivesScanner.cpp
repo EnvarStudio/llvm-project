@@ -197,8 +197,8 @@ static void skipOverSpaces(const char *&First, const char *const End) {
   if (First == Current || !isAsciiIdentifierContinue(*--Current))
     return true;
 
-  // Check for a prefix of "u", "U", or "L".
-  if (*Current == 'u' || *Current == 'U' || *Current == 'L')
+  // Check for a prefix of "u", "U", "L", "f", or "n".
+  if (*Current == 'u' || *Current == 'U' || *Current == 'L' || *Current == 'f' || *Current == 'n')
     return First == Current || !isAsciiIdentifierContinue(*--Current);
 
   // Check for a prefix of "u8".

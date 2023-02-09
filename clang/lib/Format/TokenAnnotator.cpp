@@ -3778,7 +3778,8 @@ bool TokenAnnotator::spaceRequiredBetween(const AnnotatedLine &Line,
       (Left.TokenText == "L" || Left.TokenText == "u" ||
        Left.TokenText == "U" || Left.TokenText == "u8" ||
        Left.TokenText == "LR" || Left.TokenText == "uR" ||
-       Left.TokenText == "UR" || Left.TokenText == "u8R")) {
+       Left.TokenText == "UR" || Left.TokenText == "u8R" ||
+       Left.TokenText == "f" || Left.TokenText == "n")) {
     return false;
   }
   if (Left.is(TT_TemplateCloser) && Left.MatchingParen &&
